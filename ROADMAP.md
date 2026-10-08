@@ -6,7 +6,7 @@ Rule: at the end of EVERY phase → complete + update `HANDOFF.md` → commit �
 - [x] **Phase 1 — Scaffold / زیرساخت**
   `.env` config (`Settings`), `MT5Client` bridge (dry-run safe), pytest suite, README/ROADMAP/HANDOFF,
   `docs/STRATEGY.md` (bilingual spec).
-- [ ] **Phase 2 — Strategy rules engine / موتور قوانین**
+- [x] **Phase 2 — Strategy rules engine / موتور قوانین**
   `Range`, `Equilibrium` (fractal/leg × int/ext), `CorrespondingPair`, candle-count digital-root filter,
   TP-ladder + SL/buffer calculator, checklist evaluator. Unit tests on synthetic candles.
 - [ ] **Phase 3 — Live loop / حلقه‌ی زنده**

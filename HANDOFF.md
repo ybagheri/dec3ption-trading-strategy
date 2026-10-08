@@ -5,13 +5,18 @@
 
 ## Status | وضعیت
 - **Phase 1 DONE (2026-10-08):** scaffold, env config, MT5 bridge, tests, docs. Committed + pushed.
-- **Phase 2 NEXT:** strategy rules engine (range / equilibrium / counting / TP ladder + tests).
+- **Phase 2 DONE (2026-10-08):** strategy rules engine — `src/dec3ption/strategy/`:
+  `counting` (digital-root even/odd), `structure` (swings, majors, RangeLines, merged),
+  `equilibrium` (Fib-50 ×4, overlaps), `corresponding` (Minor-Major, pair invalidation, trigger scan),
+  `targets` (SL+buffer, TP ladder), `checklist` (10-item evaluator). Committed + pushed.
+- **Phase 3 NEXT:** live loop (watch SYMBOLS×TIMEFRAMES → risk-sized orders → TP management → journal).
 
 ## What works | چه چیزی کار می‌کند
 - `Settings.from_env()` reads `.env` (+ explicit env wins), `validate()`, `buffer_size()`, `tp_price()`.
 - `MT5Client`: lazy MT5 import, `connect()` returns False (never raises) without terminal,
   `fetch_rates()` → DataFrame, `place_market_order()` dry-run safe.
-- `pytest`: 11 tests, all pass without a terminal (مستقل از ترمینال).
+- Strategy engine pure functions on candle DataFrames (no terminal needed).
+- `pytest`: 23 tests, all pass without a terminal (مستقل از ترمینال).
 
 ## Environment | محیط
 - Repo: `git@github.com:ybagheri/dec3ption-trading-strategy.git` (branch `main`)
