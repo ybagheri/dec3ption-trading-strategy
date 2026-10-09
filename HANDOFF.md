@@ -4,12 +4,10 @@
 > پایان هر فاز، قبل از کامیت و پوش به‌روز می‌شود.
 
 ## Status | وضعیت
-- **Phase 1 DONE (2026-10-08):** scaffold, env config, MT5 bridge, tests, docs. Committed + pushed.
-- **Phase 2 DONE (2026-10-08):** strategy rules engine — `src/dec3ption/strategy/`:
-  `counting` (digital-root even/odd), `structure` (swings, majors, RangeLines, merged),
-  `equilibrium` (Fib-50 ×4, overlaps), `corresponding` (Minor-Major, pair invalidation, trigger scan),
-  `targets` (SL+buffer, TP ladder), `checklist` (10-item evaluator). Committed + pushed.
-- **Phase 3 NEXT:** live loop (watch SYMBOLS×TIMEFRAMES → risk-sized orders → TP management → journal).
+- **Audit Phase 1 DONE (2026-10-09):** git clean @ `c8aa285`, baseline 23/23 pass,
+  MT5 paths verified (terminal, metaeditor64, Indicators dir, MT5 pkg 5.0.6231).
+  `docs/PROJECT_AUDIT.md` created (4 high / 5 medium findings). Committed + pushed.
+- **Audit Phase 2 NEXT:** `docs/STRATEGY_SPECIFICATION.md` (verified rules vs gaps).
 
 ## What works | چه چیزی کار می‌کند
 - `Settings.from_env()` reads `.env` (+ explicit env wins), `validate()`, `buffer_size()`, `tp_price()`.
