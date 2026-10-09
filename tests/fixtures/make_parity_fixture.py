@@ -38,6 +38,20 @@ def make_frame() -> pd.DataFrame:
     return df
 
 
+def make_fuzz_frame(seed: int = 7, n: int = 400) -> pd.DataFrame:
+    """Deterministic 2-decimal random walk (Phase-1 fuzz parity contract)."""
+    import numpy as np
+    rng = np.random.default_rng(seed)
+    c = np.round(np.cumsum(rng.normal(0, 1, n)) + 100, 2)
+    o = np.r_[c[0], c[:-1]]
+    h = np.round(np.maximum(o, c) + np.abs(rng.normal(0, 0.3, n)), 2)
+    lo = np.round(np.minimum(o, c) - np.abs(rng.normal(0, 0.3, n)), 2)
+    df = pd.DataFrame({"open": o, "high": h, "low": lo, "close": c})
+    df["time"] = pd.date_range("2023-01-01", periods=n, freq="min")
+    df["tick_volume"] = 1
+    return df
+
+
 if __name__ == "__main__":
     out_dir = Path(__file__).resolve().parent
     df = make_frame()
@@ -46,3 +60,10 @@ if __name__ == "__main__":
     exp = pd.DataFrame([s.__dict__ for s in sigs])
     exp.to_csv(out_dir / "parity_expected.csv", index=False)
     print(exp.to_string(index=False))
+
+    # Fuzz fixture (buffer=0.1, lookback=500, strict level-before-touch).
+    fz = make_fuzz_frame()
+    fz.to_csv(out_dir / "parity_fuzz_bars.csv", index=False)
+    fsig = indicator_signals(fz, buffer=0.1, lookback=500)
+    pd.DataFrame([s.__dict__ for s in fsig]).to_csv(out_dir / "parity_fuzz_expected.csv", index=False)
+    print(f"fuzz signals: {len(fsig)}")

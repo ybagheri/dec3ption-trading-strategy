@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2026-10-09 — Refactor Phase 1 (correctness)
+- **FIX** `structure.detect_range`: `RangeLines` was built with positional args in the wrong order
+  (external_high held a LOW swing price). Now keyword args + test.
+- **FIX** self-confirming signals: the Minor-Major candle that defined the level could also touch it and
+  confirm the entry on the same bar (~half of signals on random-walk data). Level must now be formed
+  strictly BEFORE the touch bar. Legacy behaviour: `allow_same_bar=True` / `InpAllowSameBar=true`.
+  `IndicatorSignal` gains `level_index`, `touch_index`.
+- **FIX** `equilibrium.Equilibriums`: `from_leg` no longer fabricates identical internal/leg lines
+  (`None` = unknown); `overlaps()` ignores unknown lines.
+- **FIX** Python mirror ignored the `lookback` bound when searching for the level (MQL5 did not).
+- **PARITY** configurable `doji_ratio`, `max_closes`; buffer modes `fixed` / `adaptive`
+  (`max(2*spread, 0.1*|entry-level|)`) in Python and MQL5 (v1.01).
+- New fuzz parity fixture `tests/fixtures/parity_fuzz_*.csv` (15 signals). 47 tests pass.
+- **NOTE** `results/` (Phase 6) were produced with the legacy same-bar behaviour and must be regenerated.
+  MQL5 v1.01 is NOT yet compiled/verified in MetaEditor.
+
 ## 2026-10-09 — Audit + completion pass
 ### Phase 1–2 (audit & spec)
 - `docs/PROJECT_AUDIT.md` — 4 high / 5 medium findings, baseline 23/23 pass.

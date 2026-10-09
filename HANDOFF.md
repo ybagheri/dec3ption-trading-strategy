@@ -32,7 +32,11 @@
   `results/` (CSVs + summary + README with honest limits). Committed + pushed.
 - **Audit Phase 7 (final) DONE (2026-10-09):** 31/31 pytest pass, secrets scan clean,
   ROADMAP/CHANGELOG/HANDOFF updated, all phases committed and pushed.
-- **Next:** Phase 3 live loop (risk-sized orders from config, 0.5% sizing, journal),
+- **Refactor Phase 1 DONE (2026-10-09):** detect_range arg-order bug, self-confirming signals,
+  equilibrium placeholders, lookback parity, configurable doji/max_closes/buffer modes (Python + MQL5 v1.01),
+  fuzz parity fixture. **47/47 pytest pass.** MQL5 v1.01 NOT compiled yet (user-side). `results/` are STALE.
+  Open rules: `docs/OPEN_QUESTIONS.md`.
+- **Next:** Refactor Phase 2 (wire F0 / corresponding pair / permission into the signal path), then Phase 3 live loop (risk-sized orders from config, 0.5% sizing, journal),
   then backtest upgrades (spread/commission, IS/OOS split, daily limits).
 
 ## Final status | وضعیت نهایی
@@ -60,4 +64,4 @@
   to use the logged-in terminal. | فایل `.env` شخصی را بسازید.
 - Live-order path (`dry_run=false`) is implemented but UNTESTED against a real terminal — test on demo first.
   مسیر سفارش واقعی پیاده شده ولی تست نشده — اول روی دمو.
-- Strategy engine (Phase 2) not started; spec is `docs/STRATEGY.md`.
+- Strategy engine covers only the Minor-Major touch trigger; remaining layers: refactor Phase 2.

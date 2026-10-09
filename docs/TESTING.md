@@ -7,7 +7,7 @@ Five distinct categories — passing one proves nothing about the others:
 ```powershell
 .\.venv\Scripts\python.exe -m pytest tests -q
 ```
-27 tests, no terminal required. Regression tests pin every audit fix (tolerance kill, closed bars,
+47 tests (Phase 1), no terminal required. Regression tests pin every audit fix (tolerance kill, closed bars,
 R6.4 skip, TF validation). Note: on this machine set `$env:TMP` to a writable dir — the global Temp
 symlink cleanup raises a benign `PermissionError` at session finish (results unaffected).
 
@@ -26,3 +26,11 @@ symlink cleanup raises a benign `PermissionError` at session finish (results una
 3. Expect: green/red arrows on confirmation closes + dashed orange SL / blue TP1 rays (30 bars).
 4. Compare arrows against `tests/fixtures/parity_expected.csv` logic on the same bars; report mismatches.
 ## 5) Backtest — Phase 6.
+
+## Phase-1 MQL5 parity check (USER-SIDE, v1.01)
+1. Re-compile `Dec3ptionTradingStrategy.mq5` in MetaEditor (F7) — expect 0 errors/0 warnings.
+2. Python/MQL5 parity needs matching inputs: `InpBufferMode=BUF_FIXED`, `InpBufferPoints` equal to
+   `buffer/_Point` used in the fixture (fuzz fixture: `buffer=0.1`), `InpMaxCloses=2`, `InpDojiBodyRatio=0.1`,
+   `InpAllowSameBar=false`, `InpLookback=500`. For `BUF_ADAPTIVE` set `InpSpreadPoints>0` (Python takes a constant spread).
+3. Load `tests/fixtures/parity_fuzz_bars.csv` as a custom symbol and compare arrow bars with
+   `tests/fixtures/parity_fuzz_expected.csv` (`index`, `direction`). An automated CSV exporter is Phase 3.

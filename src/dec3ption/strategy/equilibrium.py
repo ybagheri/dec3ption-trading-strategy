@@ -16,34 +16,42 @@ def fib_50(start: float, end: float) -> float:
 
 @dataclass(frozen=True)
 class Equilibriums:
-    """The 4 equilibrium levels. چهار خط تعادل."""
-    fractal_internal: float
-    fractal_external: float
-    leg_internal: float
-    leg_external: float
+    """The 4 equilibrium levels; None = unknown (never faked). چهار خط تعادل.
+
+    Phase-1 fix: `from_leg` used to copy the same 50% into all four lines, so
+    `overlaps()` always reported a (fake) coincidence.
+    """
+    fractal_internal: float | None = None
+    fractal_external: float | None = None
+    leg_internal: float | None = None
+    leg_external: float | None = None
 
     @classmethod
     def from_leg(cls, leg_start: float, consumption: float,
                  flat_start: float | None = None) -> "Equilibriums":
-        """External: 50% of (leg start -> consumption). Internal: 50% of the
-        flat/F0 interior (falls back to the same 50% when unknown).
+        """External fractal: 50% of (leg start -> consumption).
+        Internal fractal: 50% of (flat/F0 start -> consumption), only when known.
 
-        خارجی: ۵۰٪ شروع لگ تا مصرف. داخلی: ۵۰٪ فضای داخلی.
+        خارجی: ۵۰٪ شروع لگ تا مصرف. داخلی: فقط وقتی flat_start معلوم باشد.
+        SPEC-GAP: leg (time) equilibrium needs the unrevealed II.4 procedure ->
+        left None (docs/OPEN_QUESTIONS.md Q-LEG-EQ).
         """
-        ext = fib_50(leg_start, consumption)
-        internal = fib_50(flat_start if flat_start is not None else leg_start, consumption)
-        return cls(fractal_internal=internal, fractal_external=ext,
-                   leg_internal=internal, leg_external=ext)
+        internal = fib_50(flat_start, consumption) if flat_start is not None else None
+        return cls(fractal_internal=internal,
+                   fractal_external=fib_50(leg_start, consumption))
 
     def overlaps(self, tol_fraction: float = 0.002) -> list[tuple[str, str, float]]:
-        """Pairs of lines coinciding within tolerance -> key zones.
+        """Pairs of KNOWN lines coinciding within tolerance -> key zones.
 
-        هم‌پوشانی خطوط = ناحیه‌ی کلیدی (بقیه دور ریخته می‌شود).
+        هم‌پوشانی خطوط شناخته‌شده = ناحیه‌ی کلیدی (بقیه دور ریخته می‌شود).
         """
-        lines = {"fractal_internal": self.fractal_internal,
-                 "fractal_external": self.fractal_external,
-                 "leg_internal": self.leg_internal,
-                 "leg_external": self.leg_external}
+        lines = {k: v for k, v in (
+            ("fractal_internal", self.fractal_internal),
+            ("fractal_external", self.fractal_external),
+            ("leg_internal", self.leg_internal),
+            ("leg_external", self.leg_external)) if v is not None}
+        if len(lines) < 2:
+            return []
         span = max(lines.values()) - min(lines.values())
         span = span if span > 0 else 1e-12
         out: list[tuple[str, str, float]] = []
@@ -51,6 +59,6 @@ class Equilibriums:
         for i in range(len(names)):
             for j in range(i + 1, len(names)):
                 if abs(lines[names[i]] - lines[names[j]]) / span <= tol_fraction:
-                    mid = (lines[names[i]] + lines[names[j]]) / 2.0
-                    out.append((names[i], names[j], mid))
+                    out.append((names[i], names[j],
+                                (lines[names[i]] + lines[names[j]]) / 2.0))
         return out

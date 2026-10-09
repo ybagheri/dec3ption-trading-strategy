@@ -41,7 +41,7 @@ def is_bearish_minor_major(df: pd.DataFrame, i: int) -> bool:
     return bool(c[i] < o[i] and c[i - 1] < o[i - 1] and c[i] < lo[i - 1])
 
 
-def is_doji_or_inside(df: pd.DataFrame, i: int) -> bool:
+def is_doji_or_inside(df: pd.DataFrame, i: int, doji_ratio: float = 0.1) -> bool:
     """Doji / inside bar: not counted toward the 2-close limit. دوجی/اینسایدبار حساب نیست."""
     o = df["open"].to_numpy()
     c = df["close"].to_numpy()
@@ -51,7 +51,7 @@ def is_doji_or_inside(df: pd.DataFrame, i: int) -> bool:
         return False
     body = abs(c[i] - o[i])
     rng = h[i] - lo[i]
-    doji = rng > 0 and body / rng < 0.1
+    doji = rng > 0 and body / rng < doji_ratio
     inside = h[i] <= h[i - 1] and lo[i] >= lo[i - 1]
     return bool(doji or inside)
 

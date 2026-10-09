@@ -1,3 +1,7 @@
+> ⚠️ **STALE (2026-10-09, refactor Phase 1):** these numbers were produced BEFORE the same-bar self-confirmation
+> fix (`allow_same_bar`). Re-run `scripts/historical_validation.py` before quoting any result.
+> این نتایج قبل از اصلاح سیگنال خودتأییدگر تولید شده‌اند و باید دوباره تولید شوند.
+
 # Historical validation — 2026-10-09 (Phase 6)
 
 Dataset: Alpari MT5 demo terminal, real OHLC history, last 2000 bars

@@ -96,7 +96,13 @@ def detect_range(df: pd.DataFrame, order: int = 2) -> RangeLines | None:
     lows = [s for s in majors if s.kind == "low"]
     if len(highs) < 2 or len(lows) < 2:
         return None
-    # most recent opposite pair = internal; one step back = external
-    internal_high, external_high = highs[-1].price, highs[-2].price
-    internal_low, external_low = lows[-1].price, lows[-2].price
-    return RangeLines(internal_high, external_high, internal_low, external_low)
+    # most recent opposite pair = internal; one step back = external.
+    # SPEC-GAP: "internal inside external" nesting is NOT guaranteed by this
+    # simplified rule (see docs/OPEN_QUESTIONS.md Q-RANGE-NESTING).
+    # Keyword args: positional order once swapped the fields (Phase-1 fix).
+    return RangeLines(
+        internal_high=highs[-1].price,
+        internal_low=lows[-1].price,
+        external_high=highs[-2].price,
+        external_low=lows[-2].price,
+    )

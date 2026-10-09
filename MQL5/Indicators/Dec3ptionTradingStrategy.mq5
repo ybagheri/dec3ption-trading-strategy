@@ -12,7 +12,7 @@
 //| -> confirmed arrows do not repaint (R9.1).                          |
 //+------------------------------------------------------------------+
 #property copyright "Dec3ption Group-II"
-#property version   "1.00"
+#property version   "1.01"
 #property indicator_chart_window
 #property indicator_buffers 4
 #property indicator_plots   4
@@ -34,9 +34,21 @@
 #property indicator_style4  STYLE_DASH
 #property indicator_label4  "TakeProfit1"
 
+//--- buffer mode (Phase-1: must mirror Python indicator_signals)
+enum ENUM_BUFFER_MODE
+{
+   BUF_FIXED    = 0,   // fixed points (InpBufferPoints)
+   BUF_ADAPTIVE = 1    // max(mult*spread, fraction*|entry-level|)
+};
+
 //--- inputs
 input int    InpLookback       = 500;    // Lookback bars for level search
-input double InpBufferPoints   = 10.0;   // SL buffer (points)
+input ENUM_BUFFER_MODE InpBufferMode = BUF_FIXED; // SL buffer mode
+input double InpBufferPoints   = 10.0;   // Fixed SL buffer (points)
+input double InpSpreadPoints   = 0.0;    // Adaptive: spread in points (0 = use bar spread; parity needs >0)
+input double InpSpreadMult     = 2.0;    // Adaptive: spread multiplier
+input double InpRangeFraction  = 0.1;    // Adaptive: fraction of |entry-level|
+input bool   InpAllowSameBar   = false;  // Legacy: level may form on the touch bar itself
 input int    InpMaxCloses      = 2;      // Closes beyond level before kill
 input double InpDojiBodyRatio  = 0.1;    // Body/range ratio = doji (skipped)
 input int    InpLevelsRayBars  = 30;     // SL/TP1 ray length (bars)
@@ -100,6 +112,15 @@ bool KilledByCloses(const double &o[], const double &h[], const double &l[],
    return false;
 }
 //+------------------------------------------------------------------+
+// SL buffer in price units. Mirrors Python _buffer_for().
+double BufferFor(const double entry, const double level, const int spreadPts)
+{
+   if(InpBufferMode == BUF_FIXED)
+      return InpBufferPoints * _Point;
+   double sp = (InpSpreadPoints > 0.0 ? InpSpreadPoints : (double)spreadPts) * _Point;
+   return MathMax(InpSpreadMult * sp, InpRangeFraction * MathAbs(entry - level));
+}
+//+------------------------------------------------------------------+
 int OnInit()
 {
    SetIndexBuffer(0, BufBuy,  INDICATOR_DATA);
@@ -114,8 +135,10 @@ int OnInit()
    PlotIndexSetDouble(1, PLOT_EMPTY_VALUE, EMPTY_VALUE);
    PlotIndexSetDouble(2, PLOT_EMPTY_VALUE, EMPTY_VALUE);
    PlotIndexSetDouble(3, PLOT_EMPTY_VALUE, EMPTY_VALUE);
-   Print("Dec3ptionTradingStrategy v1.00 init: lookback=", InpLookback,
-         " bufferPts=", InpBufferPoints, " maxCloses=", InpMaxCloses);
+   Print("Dec3ptionTradingStrategy v1.01 init: lookback=", InpLookback,
+         " bufferMode=", (int)InpBufferMode, " bufferPts=", InpBufferPoints,
+         " maxCloses=", InpMaxCloses, " dojiRatio=", InpDojiBodyRatio,
+         " allowSameBar=", InpAllowSameBar);
    return INIT_SUCCEEDED;
 }
 //+------------------------------------------------------------------+
@@ -141,7 +164,6 @@ int OnCalculate(const int rates_total,
       BufSL[i]  = EMPTY_VALUE; BufTP1[i]  = EMPTY_VALUE;
    }
 
-   double buffer = InpBufferPoints * _Point;
    int first = MathMax(1, lastClosed - InpLookback);
 
    for(int i = first + 1; i <= lastClosed; i++)
@@ -150,7 +172,9 @@ int OnCalculate(const int rates_total,
       {
          int direction = (d == 0 ? 1 : -1);
          double level = 0;
-         int formed = LastMMLevel(open, high, low, close, i, first, direction, level);
+         // Level must be formed STRICTLY BEFORE the touch bar (unless legacy flag).
+         int levelEnd = (InpAllowSameBar ? i : i - 1);
+         int formed = LastMMLevel(open, high, low, close, levelEnd, first, direction, level);
          if(formed < 0) continue;
          if(KilledByCloses(open, high, low, close, formed, i, level, direction)) continue;
          if(!(low[i] <= level && level <= high[i])) continue;   // touch of the level
@@ -161,6 +185,7 @@ int OnCalculate(const int rates_total,
                                      : IsBearMM(open, low, close, j));
             if(!mm) continue;
             double entry = close[j];
+            double buffer = BufferFor(entry, level, spread[j]);
             double sl = (direction > 0 ? level - buffer : level + buffer);
             double risk = MathAbs(entry - sl);
             double tp1 = (direction > 0 ? entry + risk : entry - risk);
