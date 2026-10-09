@@ -25,7 +25,21 @@
   **0 errors, 0 warnings, 614 ms** (`MQL5\Logs\20261009.log` 10:47:10), `.ex5` generated.
   Terminal is running (user session — untouched). Chart-load verification is USER-SIDE (steps in TESTING.md).
   Committed + pushed.
-- **Audit Phase 6 NEXT:** backtest harness on Python mirror + honest metrics/limits.
+- **Audit Phase 6 DONE (2026-10-09):** `scripts/historical_validation.py` ran on REAL
+  Alpari-demo history (2000 closed bars/symbol, read-only terminal access, login 5319… not stored):
+  XAUUSD M1 +8.0R/66.7%, NAS100 M5 +4.0R/60%, EURUSD M5 −1.0R, US30 M5 −4.0R, US500 M5 −4.0R.
+  Small sample, no spread/commission, conservative same-bar SL-first, no walk-forward.
+  `results/` (CSVs + summary + README with honest limits). Committed + pushed.
+- **Audit Phase 7 (final) DONE (2026-10-09):** 31/31 pytest pass, secrets scan clean,
+  ROADMAP/CHANGELOG/HANDOFF updated, all phases committed and pushed.
+- **Next:** Phase 3 live loop (risk-sized orders from config, 0.5% sizing, journal),
+  then backtest upgrades (spread/commission, IS/OOS split, daily limits).
+
+## Final status | وضعیت نهایی
+- GitHub: `git@github.com:ybagheri/dec3ption-trading-strategy` @ `main` — all pushed.
+- Tests: 31/31 (config 8, client 4, strategy 15, parity 4).
+- Indicator: compiled 0/0, deployed to live Indicators dir.
+- No live orders ever sent (dry_run=true default).
 
 ## What works | چه چیزی کار می‌کند
 - `Settings.from_env()` reads `.env` (+ explicit env wins), `validate()`, `buffer_size()`, `tp_price()`.

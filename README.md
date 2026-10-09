@@ -36,6 +36,24 @@ with MT5Client(settings) as client:
 ```
 src/dec3ption/      engine (config, mt5_client, strategy/...)
 tests/              pytest suite (runs without a terminal)
-docs/STRATEGY.md    bilingual strategy specification
+MQL5/Indicators/    native MT5 custom indicator
+scripts/            deploy + historical validation
+results/            Phase-6 validation output (read me first: small sample)
+docs/STRATEGY.md    bilingual strategy narrative
+docs/STRATEGY_SPECIFICATION.md  testable rules contract
+docs/PROJECT_AUDIT.md / ARCHITECTURE.md / TESTING.md
 .env                your private settings (never committed)
 ```
+
+## Indicator (MT5) | اندیکاتور متاتریدر
+
+1. Deploy (backup-safe): `powershell -File scripts\deploy_indicator.ps1`
+2. Compile: MetaEditor → open the deployed `.mq5` → F7 (0 errors/0 warnings verified 2026-10-09).
+3. Load: Navigator → Indicators → Dec3ptionTradingStrategy → drag onto an M1/M5 chart.
+4. Inputs: `InpBufferPoints` (SL buffer in points), `InpMaxCloses`, `InpLookback`.
+5. Arrows = confirmed signals on closed candles (non-repainting); dashed rays = SL/TP1.
+
+## Historical validation
+`python scripts\historical_validation.py` → `results/` (R-multiple metrics;
+see `results/README.md` for limitations — no spread, small sample, no walk-forward).
+

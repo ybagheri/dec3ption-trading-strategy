@@ -1,0 +1,82 @@
+[
+ {
+  "symbol": "XAUUSD",
+  "timeframe": "M1",
+  "bars": 1999,
+  "signals": 24,
+  "metrics": {
+   "trades": 24,
+   "wins": 16,
+   "losses": 8,
+   "expired_no_hit": 0,
+   "net_R": 8.0,
+   "win_rate": 0.6667,
+   "expectancy_R": 0.3333,
+   "max_dd_R": -2.0
+  }
+ },
+ {
+  "symbol": "US30",
+  "timeframe": "M5",
+  "bars": 1999,
+  "signals": 26,
+  "metrics": {
+   "trades": 26,
+   "wins": 11,
+   "losses": 15,
+   "expired_no_hit": 0,
+   "net_R": -4.0,
+   "win_rate": 0.4231,
+   "expectancy_R": -0.1538,
+   "max_dd_R": -6.0
+  }
+ },
+ {
+  "symbol": "NAS100",
+  "timeframe": "M5",
+  "bars": 1999,
+  "signals": 20,
+  "metrics": {
+   "trades": 20,
+   "wins": 12,
+   "losses": 8,
+   "expired_no_hit": 0,
+   "net_R": 4.0,
+   "win_rate": 0.6,
+   "expectancy_R": 0.2,
+   "max_dd_R": -4.0
+  }
+ },
+ {
+  "symbol": "US500",
+  "timeframe": "M5",
+  "bars": 1999,
+  "signals": 27,
+  "metrics": {
+   "trades": 27,
+   "wins": 11,
+   "losses": 15,
+   "expired_no_hit": 1,
+   "net_R": -4.0,
+   "win_rate": 0.4074,
+   "expectancy_R": -0.1481,
+   "max_dd_R": -6.0
+  }
+ },
+ {
+  "symbol": "EURUSD",
+  "timeframe": "M5",
+  "bars": 1999,
+  "signals": 21,
+  "metrics": {
+   "trades": 21,
+   "wins": 10,
+   "losses": 11,
+   "expired_no_hit": 0,
+   "net_R": -1.0,
+   "win_rate": 0.4762,
+   "expectancy_R": -0.0476,
+   "max_dd_R": -6.0
+  }
+ }
+]
