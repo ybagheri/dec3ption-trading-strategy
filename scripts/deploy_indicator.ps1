@@ -1,7 +1,7 @@
 # Deploy the indicator to the MT5 data folder (safe: never overwrites without backup).
 # استقرار اندیکاتور در پوشه‌ی متاتریدر (با بکاپ‌گیری، بدون بازنویسی کور).
 param(
-    [string]$RepoRoot = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),
+    [string]$RepoRoot = (Split-Path -Parent $PSScriptRoot),
     [string]$IndicatorsDir = "C:\Users\BazikadeStore\AppData\Roaming\MetaQuotes\Terminal\AF19ECCF568F855DF9D3196BBF8BF315\MQL5\Indicators"
 )
 $ErrorActionPreference = "Stop"

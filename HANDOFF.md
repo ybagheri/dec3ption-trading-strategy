@@ -20,7 +20,12 @@
   `parity_expected.csv`: BUY@5/13/20, SELL@23) + `test_parity.py` (fixture match, exact values,
   determinism, stability, empty-data). Deploy script `scripts/deploy_indicator.ps1` (backup-safe).
   **31/31 pytest pass. NOT yet compiled** (Phase 5). Committed + pushed.
-- **Audit Phase 5 NEXT:** compile with metaeditor64, deploy to Indicators dir, verify load.
+- **Audit Phase 5 DONE (2026-10-09):** deployed `.mq5` to the live Indicators dir (backup-safe script;
+  fixed one-level-too-deep `$RepoRoot` bug), compiled with the real MetaEditor:
+  **0 errors, 0 warnings, 614 ms** (`MQL5\Logs\20261009.log` 10:47:10), `.ex5` generated.
+  Terminal is running (user session — untouched). Chart-load verification is USER-SIDE (steps in TESTING.md).
+  Committed + pushed.
+- **Audit Phase 6 NEXT:** backtest harness on Python mirror + honest metrics/limits.
 
 ## What works | چه چیزی کار می‌کند
 - `Settings.from_env()` reads `.env` (+ explicit env wins), `validate()`, `buffer_size()`, `tp_price()`.
