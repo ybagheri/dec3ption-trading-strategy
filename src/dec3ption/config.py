@@ -29,6 +29,9 @@ def _parse_float_csv(value: str) -> tuple[float, ...]:
     return tuple(float(p.strip()) for p in value.split(",") if p.strip())
 
 
+SUPPORTED_TIMEFRAMES = ("M1", "M5", "M15", "H1", "H4", "D1")
+
+
 @dataclass(frozen=True)
 class Settings:
     """Immutable runtime settings loaded from `.env` / environment."""
@@ -112,6 +115,9 @@ class Settings:
             errors.append("SYMBOLS is empty")
         if not self.timeframes:
             errors.append("TIMEFRAMES is empty")
+        for tf in self.timeframes:
+            if tf not in SUPPORTED_TIMEFRAMES:
+                errors.append(f"Unsupported TIMEFRAME: {tf} (supported: {SUPPORTED_TIMEFRAMES})")
         if not (0 < self.risk_pct <= 100):
             errors.append(f"RISK_PCT out of range: {self.risk_pct}")
         if not (0 < self.max_daily_loss_pct <= 100):

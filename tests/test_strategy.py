@@ -118,6 +118,32 @@ def test_scan_trigger_buy():
     assert sig is not None and sig.direction == +1
 
 
+# -- Phase 3 regression tests (audit fixes) --------------------------------------
+def test_kill_as_f0_needs_tolerance():
+    pair = CP.CorrespondingPair(origin=100.0, low=90.0, high=110.0, direction=1)
+    pair.kill_as_f0(90.0000001)  # float noise: exact comparison must NOT fire
+    assert pair.low_dead is False
+    pair.kill_as_f0(90.0000001, tol=0.001)  # tick-size tolerance fires
+    assert pair.low_dead is True
+
+
+def test_closed_bars_drops_forming_bar():
+    df = make_df([(1, 2, 0.5, 1.5)] * 5)
+    closed = S.closed_bars(df)
+    assert len(closed) == 4
+    assert S.closed_bars(df.iloc[0:0]).empty
+
+
+def test_scan_trigger_skips_candle_taking_opposite_tp1():
+    pair = CP.CorrespondingPair(origin=100.0, low=90.0, high=110.0, direction=1)
+    df = make_df([
+        (95, 95.6, 94, 95.5), (91, 93, 89.5, 92.5),
+        (92.5, 116, 92, 110), (110, 111, 105, 106),  # MM at 2, high takes TP1=115
+    ])
+    assert CP.scan_trigger(df, pair, 0) is not None  # no filter -> signal
+    assert CP.scan_trigger(df, pair, 0, opposite_tp1_buy=115.0) is None  # R6.4 skip
+
+
 # -- targets -------------------------------------------------------------------
 def _settings():
     return Settings(mt5_path=Path("x"), tp_ladder=(1.0, 3.0, 6.0))

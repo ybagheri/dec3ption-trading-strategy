@@ -10,9 +10,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+import logging
 import pandas as pd
 
 from .config import Settings
+
+logger = logging.getLogger(__name__)
 
 TIMEFRAME_MAP = {
     "M1": "TIMEFRAME_M1",
@@ -62,6 +65,7 @@ class MT5Client:
         try:
             mt5 = self._import_mt5()
         except ImportError:
+            logger.warning("MetaTrader5 package not installed; running disconnected")
             return False
         path = str(self.settings.mt5_path)
         kwargs: dict[str, Any] = {"path": path, "timeout": self.settings.mt5_timeout_ms}
@@ -69,6 +73,7 @@ class MT5Client:
             kwargs["portable"] = False
         try:
             if not mt5.initialize(**kwargs):
+                logger.warning("mt5.initialize failed for path=%s", path)
                 return False
             if self.settings.mt5_login:
                 if not mt5.login(
@@ -76,9 +81,11 @@ class MT5Client:
                     password=self.settings.mt5_password or "",
                     server=self.settings.mt5_server or "",
                 ):
+                    logger.warning("mt5.login failed for login=%s", self.settings.mt5_login)
                     mt5.shutdown()
                     return False
         except Exception:
+            logger.exception("MT5 connect raised unexpectedly")
             return False
         self._mt5 = mt5
         self._connected = True

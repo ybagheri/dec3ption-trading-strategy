@@ -16,6 +16,10 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def is_bullish_minor_major(df: pd.DataFrame, i: int) -> bool:
     """Two green candles, second closes above first's high. دو کندل سبز صعودی."""
@@ -80,11 +84,16 @@ class CorrespondingPair:
             if self.closes_beyond_high > 2:
                 self.high_dead = True
 
-    def kill_as_f0(self, price: float) -> None:
-        """Price revisits a level as Fractal-0 -> that side dead. برگشت در قالب فرکتال صفر."""
-        if abs(price - self.low) < 1e-12:
+    def kill_as_f0(self, price: float, tol: float = 0.0) -> None:
+        """Price revisits a level as Fractal-0 -> that side dead.
+
+        برگشت در قالب فرکتال صفر. `tol` is an absolute price tolerance
+        (pass the symbol's tick size / point in live code) — exact-float
+        comparison never fires on real quotes (audit fix).
+        """
+        if abs(price - self.low) <= tol:
             self.low_dead = True
-        if abs(price - self.high) < 1e-12:
+        if abs(price - self.high) <= tol:
             self.high_dead = True
 
 
@@ -97,10 +106,14 @@ class EntrySignal:
 
 
 def scan_trigger(df: pd.DataFrame, pair: CorrespondingPair,
-                 start: int) -> EntrySignal | None:
+                 start: int,
+                 opposite_tp1_buy: float | None = None,
+                 opposite_tp1_sell: float | None = None) -> EntrySignal | None:
     """Scan for return-to-level + Minor-Major confirmation within 2 candles.
 
     برگشت به سطح + تأیید مینور-ماجور حداکثر در ۲ کندل → سیگنال ورود در کلوز.
+    R6.4: a confirmation candle that already reached the opposite side's TP1
+    is skipped (pass the TP1 price); scanning continues past it.
     """
     closes = df["close"].to_numpy()
     lows = df["low"].to_numpy()
@@ -110,10 +123,18 @@ def scan_trigger(df: pd.DataFrame, pair: CorrespondingPair,
         if not pair.low_dead and lows[i] <= pair.low <= highs[i]:
             for j in range(i, min(i + 2, len(df))):
                 if is_bullish_minor_major(df, j):
+                    if opposite_tp1_buy is not None and highs[j] >= opposite_tp1_buy:
+                        logger.debug("buy trigger at %d skipped: took opposite TP1", j)
+                        break  # this touch is spent; wait for the next touch
+                    logger.debug("buy trigger at index %d, level %f", j, pair.low)
                     return EntrySignal(j, +1, float(closes[j]), pair.low)
         # sell side: touch of the high
         if not pair.high_dead and lows[i] <= pair.high <= highs[i]:
             for j in range(i, min(i + 2, len(df))):
                 if is_bearish_minor_major(df, j):
+                    if opposite_tp1_sell is not None and lows[j] <= opposite_tp1_sell:
+                        logger.debug("sell trigger at %d skipped: took opposite TP1", j)
+                        break
+                    logger.debug("sell trigger at index %d, level %f", j, pair.high)
                     return EntrySignal(j, -1, float(closes[j]), pair.high)
     return None

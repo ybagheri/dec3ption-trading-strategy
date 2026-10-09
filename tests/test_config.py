@@ -79,3 +79,10 @@ def test_invalid_settings_raise(monkeypatch, tmp_path):
 def test_missing_mt5_path_raises(monkeypatch, tmp_path):
     with pytest.raises(ValueError, match="MT5_PATH"):
         Settings.from_env(env_file=tmp_path / "none.env").validate()
+
+
+def test_invalid_timeframe_raises(monkeypatch, tmp_path):
+    _base_env(monkeypatch, tmp_path)
+    monkeypatch.setenv("TIMEFRAMES", "M1,MINUTE")
+    with pytest.raises(ValueError, match="Unsupported TIMEFRAME"):
+        Settings.from_env(env_file=tmp_path / "none.env").validate()

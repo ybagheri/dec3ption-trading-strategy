@@ -10,7 +10,10 @@
 - **Audit Phase 2 DONE (2026-10-09):** `docs/STRATEGY_SPECIFICATION.md` created —
   30+ numbered requirements [V]/[T]/[G], signal semantics (closed-candle only), traceability table.
   Committed + pushed.
-- **Audit Phase 3 NEXT:** core refactoring (tolerance kill, closed-bar helper, TP1 filter, logging, pyproject).
+- **Audit Phase 3 DONE (2026-10-09):** refactored — tolerance `kill_as_f0`, `closed_bars` (R9.1),
+  R6.4 TP1 filter in `scan_trigger`, structured logging, TF validation, `pyproject.toml`,
+  `docs/ARCHITECTURE.md` + `docs/TESTING.md`. **27/27 pytest pass.** Committed + pushed.
+- **Audit Phase 4 NEXT:** MQL5 custom indicator + parity fixtures.
 
 ## What works | چه چیزی کار می‌کند
 - `Settings.from_env()` reads `.env` (+ explicit env wins), `validate()`, `buffer_size()`, `tp_price()`.

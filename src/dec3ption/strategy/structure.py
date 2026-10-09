@@ -12,6 +12,17 @@ from dataclasses import dataclass
 import pandas as pd
 
 
+def closed_bars(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop the last (still-forming) bar. Signals evaluate on CLOSED candles only.
+
+    حذف کندل آخر (در حال تشکیل). سیگنال‌ها فقط روی کندل‌های بسته — وگرنه repaint.
+    Spec R9.1. Returns a copy; empty/small frames pass through safely.
+    """
+    if len(df) <= 1:
+        return df.iloc[0:0].copy()
+    return df.iloc[:-1].copy()
+
+
 @dataclass(frozen=True)
 class Swing:
     index: int
