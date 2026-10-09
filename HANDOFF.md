@@ -13,7 +13,14 @@
 - **Audit Phase 3 DONE (2026-10-09):** refactored — tolerance `kill_as_f0`, `closed_bars` (R9.1),
   R6.4 TP1 filter in `scan_trigger`, structured logging, TF validation, `pyproject.toml`,
   `docs/ARCHITECTURE.md` + `docs/TESTING.md`. **27/27 pytest pass.** Committed + pushed.
-- **Audit Phase 4 NEXT:** MQL5 custom indicator + parity fixtures.
+- **Audit Phase 4 DONE (2026-10-09):** genuine MQL5 custom indicator
+  `MQL5/Indicators/Dec3ptionTradingStrategy.mq5` (chart window; Buy/Sell arrow buffers + SL/TP1 ray
+  buffers; closed-bar-only logic; bounds-checked; diagnostics in OnInit) + Python mirror
+  `strategy/indicator.py` (single source of truth) + parity fixtures (`parity_bars.csv`,
+  `parity_expected.csv`: BUY@5/13/20, SELL@23) + `test_parity.py` (fixture match, exact values,
+  determinism, stability, empty-data). Deploy script `scripts/deploy_indicator.ps1` (backup-safe).
+  **31/31 pytest pass. NOT yet compiled** (Phase 5). Committed + pushed.
+- **Audit Phase 5 NEXT:** compile with metaeditor64, deploy to Indicators dir, verify load.
 
 ## What works | چه چیزی کار می‌کند
 - `Settings.from_env()` reads `.env` (+ explicit env wins), `validate()`, `buffer_size()`, `tp_price()`.
